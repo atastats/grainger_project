@@ -1,0 +1,38 @@
+services:
+  ollama:  # Create a service for Ollama using the official image
+    image: ollama/ollama
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama  # Use volume to persist models across container restarts
+    healthcheck:  # Add a healthcheck to ensure the service is ready before dependent services start
+      test: ["CMD-SHELL", "ollama list || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s  # give ollama time to start before first check
+
+  ollama-init:  # Create a service to initialize Ollama by pulling the model
+    image: ollama/ollama
+    depends_on:
+      ollama:
+        condition: service_healthy  # wait for healthcheck to pass
+    entrypoint: sh -c "ollama pull qwen3:4b"  # Pull the model on startup
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - ollama_models:/root/.ollama  # same volume as ollama service
+
+  app:  # Now run the app in a separate service that depends on the model being pulled
+    build: .
+    depends_on:
+      ollama-init:
+        condition: service_completed_successfully  # wait for model pull to finish
+    environment:
+      - OLLAMA_HOST=http://ollama:11434
+    volumes:
+      - ${DATA_DIR}:/data  # Mount the data directory from the host to the container
+      - .:/output  # Mount the current directory to save outputs
+
+volumes:
+  ollama_models:

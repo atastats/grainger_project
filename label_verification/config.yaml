@@ -1,0 +1,25 @@
+data:
+  examples_path: /data/shopping_queries_dataset/shopping_queries_dataset_examples.parquet
+  products_path: /data/shopping_queries_dataset/shopping_queries_dataset_products.parquet
+  output_path: /output/results.csv
+  queries_of_interest:
+    - "aa batteries 100 pack"
+    - "kodak photo paper 8.5 x 11 glossy"
+    - "dewalt 8v max cordless screwdriver kit, gyroscopic"
+
+model:
+  name: "qwen3:4b"
+  temperature: 0
+  max_tokens: 256
+  seed: 42
+
+prompt:
+  label_verification_prompt_path: "label_verification/label_verification_prompt.txt"
+  product_context_max_length: 7500 # Maximum char length of the product context before truncation.
+  product_context:  # Define which fields from the product information we should include
+    - "product_title"  # Highest priority
+    - "product_bullet_point" # Second highest priority
+    - "product_description"  # Third highest priority, but may be truncated
+    - "product_brand"  # Included in title if "brand_in_title" is False
+    - "product_color"  # Included in title if "color_in_title" is False
+
