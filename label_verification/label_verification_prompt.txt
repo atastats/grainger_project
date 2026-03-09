@@ -11,11 +11,11 @@ For each example, extract the following keys:
 2. product_specs: List of up to 8 key product specifications that are directly relevant to the query as short phrases (1–4 words)
 3. conflict: Identify any direct, relevant conflict (brief phrase) or null
 4. is_accurate: Decide if the match is accurate (true/false)
-5. reformulated_query: If inaccurate, return a short reformulated query (≤10 words) that would correctly match the product. Construct this reformulation using only the product information. Do NOT invent or reuse query-only terms that do not appear in the product; otherwise null
+5. product_query: If the product is inaccurately matched to the query (is_accurate = false), create a new query using ONLY the product details that would NOT conflict with the product; otherwise null
 
 Respond only with a single compact, valid JSON object on a single line with no extra whitespace or newlines.
 The JSON must have exactly the following structure/keys:
-{{"query_specs": [...], "product_specs": [...], "conflict": "brief explanation or null", "is_accurate": true or false, "reformulated_query": "new reformulated query based on product_specs or null"}}
+{{"query_specs": [...], "product_specs": [...], "conflict": "brief explanation or null", "is_accurate": true or false, "product_query": "new query based on product_specs or null"}}
 
 Now, determine the product relevance for the following:
 Query: {query}

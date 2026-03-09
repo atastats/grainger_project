@@ -17,7 +17,7 @@ class VerificationResult(BaseModel):
     product_specs: Optional[List[str]]
     conflict: Optional[str]
     is_accurate: bool
-    reformulated_query: Optional[str]
+    product_query: Optional[str]
 
 
 def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:

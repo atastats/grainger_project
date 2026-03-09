@@ -107,5 +107,40 @@ deploy:
 Results are saved to `results.csv` in the project root directory after the pipeline completes.
 
 ## Results
+|   query_id | product_id   | accurate_match   | reformulated_query                                           |
+|-----------:|:-------------|:-----------------|:-------------------------------------------------------------|
+|       6014 | B01G1RYHAO   | True             |                                                              |
+|       6014 | B07FP5DNBG   | True             |                                                              |
+|       6014 | B07F7RH8D4   | True             |                                                              |
+|       6014 | B01B8R6PF2   | True             |                                                              |
+|       6014 | B00LHSAARW   | False            | aa batteries 60 pack                                         |
+|       6014 | B00KMDL8U6   | True             |                                                              |
+|       6014 | B004SCA15K   | True             |                                                              |
+|       6014 | B01B8R6V2E   | False            | aaa batteries 100 pack                                       |
+|      32814 | B07TWK2S22   | False            | dewalt 8v max cordless screwdriver kit without gyroscopic    |
+|      32814 | B0812ZHY5N   | False            | enertwist 8v max cordless screwdriver kit without gyroscopic |
+|      32814 | B07S7F53YK   | True             |                                                              |
+|      32814 | B00EUHAGX0   | False            | dewalt 8v max cordless screwdriver kit gyroscopic            |
+|      32814 | B00DL7QDS2   | True             |                                                              |
+|      32814 | B011WRUODC   | True             |                                                              |
+|      58953 | B085G3MGFR   | True             |                                                              |
+|      58953 | B085F42SV6   | False            | kodak photo paper 8.5 x 11 glossy 100 count                  |
+|      58953 | B01M0L2WLF   | True             |                                                              |
+|      58953 | B01JB7D4SW   | True             |                                                              |
+|      58953 | B000EZTYHG   | True             |                                                              |
+|      58953 | B000EZTYG2   | True             |                                                              |
+|      58953 | B000EZTYCG   | True             |                                                              |
+|      58953 | B000EZ0CTK   | False            | kodak photo paper 8.5 x 11 glossy                            |
+|      58953 | B000EYAKKW   | True             |                                                              |
+|      58953 | B000EYAKJS   | True             |                                                              |
 
-The results table below will be updated with the final markdown output from pandas once the pipeline is run:
+**Note**: product_id="B00EUHAGX0" is a DEWALT battery charger that was flagged as a mismatch for the "DEWALT 8V MAX cordless screwdriver kit" query. The verifier correctly detects a conflict, but the reformulation step wrongly regenerates a screwdriver query instead of producing a short product-focused query for the charger. This appears to be a prompt/model limitation. 
+
+Fix options: 
+1. Further prompt engineering to explicitly instruct the model to generate a product-focused reformulation.
+2. One or few-shot prompting with examples of good vs. bad reformulations to teach the model the desired output format.
+3. A stronger model
+4. Split verification and reformulation into two calls with separate prompts.
+
+## Full Results
+For full results, run the docker compose setup and check `results.csv` in the project root or look in `label_verification/notebooks/eda.ipynb`.

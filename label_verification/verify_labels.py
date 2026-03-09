@@ -63,7 +63,7 @@ def verify_row(
     # response already matches schema (inference step did validation)
     accurate = ollama_resp.get("is_accurate", False)
     reason = ollama_resp.get("conflict", "No conflict explanation provided")
-    reformulated_query = ollama_resp.get("reformulated_query")
+    reformulated_query = ollama_resp.get("product_query")
 
     if isinstance(accurate, str):
         accurate = accurate.lower() == "true"
