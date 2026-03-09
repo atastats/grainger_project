@@ -1,13 +1,23 @@
 import json
 import logging
 import os
+from typing import List, Optional
 
 import omegaconf
 import requests
+from pydantic import BaseModel
 
-logger = logging.getLogger(__name__)
+log = logging.getLogger(__name__)
 
 OLLAMA_HOST = os.getenv("OLLAMA_HOST", "http://localhost:11434")
+
+
+class VerificationResult(BaseModel):
+    query_specs: Optional[List[str]]
+    product_specs: Optional[List[str]]
+    conflict: Optional[str]
+    is_accurate: bool
+    reformulated_query: Optional[str]
 
 
 def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:
@@ -16,13 +26,15 @@ def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:
 
     Parameters
     ----------
+    config : omegaconf.dictconfig.DictConfig
+        The configuration object containing model and request settings.
     prompt: str
         The prompt to send to the model.
 
     Returns
     -------
-    str
-        The model's response as a string.
+    dict
+        The model's response as a dictionary.
 
     Raises
     ------
@@ -32,16 +44,20 @@ def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:
         If the server returns an error response.
     ValueError
         If the model returns an empty response.
+    pydantic.ValidationError
+        If the model response does not match the expected schema.
     json.JSONDecodeError
         If the model response cannot be parsed as JSON.
     """
+    # Build schema object from verification model and pass directly
+    schema = VerificationResult.model_json_schema()
     response = requests.post(
         f"{OLLAMA_HOST}/api/generate",
         json={
             "model": config.model.name,
             "prompt": prompt,
             "stream": False,
-            "format": "json",
+            "format": schema,  # Schema restricts output token decoding
             "options": {
                 "num_predict": config.model.max_tokens,
                 "temperature": config.model.temperature,
@@ -58,4 +74,11 @@ def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:
     if not response_text:
         raise ValueError("Empty response from Ollama")
 
-    return json.loads(response_text)
+    # The ollama server should already respect our schema, but validate anyway
+    try:
+        vr = VerificationResult.model_validate_json(response_text)
+    except Exception as exc:  # ValidationError or JSONDecodeError
+        log.warning("Ollama response did not match schema, returning raw text: %s", exc)
+        # Fall back to raw dict
+        return json.loads(response_text)
+    return vr.model_dump()  # Return as plain dict

@@ -60,10 +60,10 @@ def verify_row(
     )
     ollama_resp = query_ollama(config, templated_verification_prompt)
 
-    # Parse keys from LLM response
+    # response already matches schema (inference step did validation)
     accurate = ollama_resp.get("is_accurate", False)
     reason = ollama_resp.get("conflict", "No conflict explanation provided")
-    reformulated_query = ollama_resp.get("reformulated_query", None)
+    reformulated_query = ollama_resp.get("reformulated_query")
 
     if isinstance(accurate, str):
         accurate = accurate.lower() == "true"
