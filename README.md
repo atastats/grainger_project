@@ -26,25 +26,21 @@ Instructions:
 - Extra product details or included items are not conflicts.
 - Pay special attention to negations in the query (e.g., "without batteries"): if the product includes what the query excludes, that's a conflict.
 
-For each example, follow these steps:
-1. List the key specifications from the query as a list.
-2. List the key specifications from the product as a list.
-3. Identify any direct conflicts.
-4. Decide if the match is accurate (true/false).
-5. If inaccurate, reformulate the query so it accurately describes the conflicting product, not the original query.
+For each example, extract the following keys:
+1. query_specs: List of key specifications from the user query as short phrases (1–4 words)
+2. product_specs: List of up to 8 key product specifications that are directly relevant to the query as short phrases (1–4 words)
+3. conflict: Identify any direct, relevant conflict (brief phrase) or null
+4. is_accurate: Decide if the match is accurate (true/false)
+5. reformulated_query: If inaccurate, return a short reformulated query (≤10 words) that would correctly match the conflicting product; otherwise null
 
-Respond only in this JSON format:
-{{
-    "query_specs": [...],
-    "product_specs": [...],
-    "conflict": "brief explanation or null",
-    "is_accurate": true or false,
-    "reformulated_query": "new query for the conflicting product or null"
-}}
+Respond only with a single compact, valid JSON object on a single line with no extra whitespace or newlines.
+The JSON must have exactly the following structure/keys:
+{{"query_specs": [...], "product_specs": [...], "conflict": "brief explanation or null", "is_accurate": true or false,"reformulated_query": "new query for the conflicting product or null"}}
 
-Now apply the same rules to the following:
+Now, determine the product relevance for the following:
 Query: {query}
 {product_desc}
+
 ```
 
 ## Prompt Configuration

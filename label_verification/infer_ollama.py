@@ -77,8 +77,21 @@ def query_ollama(config: omegaconf.dictconfig.DictConfig, prompt: str) -> dict:
     # The ollama server should already respect our schema, but validate anyway
     try:
         vr = VerificationResult.model_validate_json(response_text)
-    except Exception as exc:  # ValidationError or JSONDecodeError
-        log.warning("Ollama response did not match schema, returning raw text: %s", exc)
-        # Fall back to raw dict
-        return json.loads(response_text)
-    return vr.model_dump()  # Return as plain dict
+    except Exception as exc:  # ValidationError, JSONDecodeError, etc.
+        # Log the exception plus the entire text so you can inspect what the model
+        # actually returned (use repr to make quotes/newlines visible).
+        log.warning(
+            f"Ollama response did not match schema ({exc}); "
+            f"raw response:\n{repr(response_text)}"
+        )
+        # try to return a dict if possible, otherwise fall back to a marker
+        try:
+            return json.loads(response_text)
+        except json.JSONDecodeError as jexc:
+            log.error(f"Unable to parse raw response as JSON: {jexc}")
+            raise ValueError(
+                "Ollama response did not match schema and could not be parsed as JSON"
+            ) from exc
+
+    # successful validation
+    return vr.model_dump()

@@ -10,12 +10,12 @@ data:
 model:
   name: "qwen3:4b"
   temperature: 0
-  max_tokens: 256
+  max_tokens: 512
   seed: 42
 
 prompt:
   label_verification_prompt_path: "label_verification/label_verification_prompt.txt"
-  product_context_max_length: 7500 # Maximum char length of the product context before truncation.
+  product_context_max_length: 5000 # Maximum char length of the product context before truncation.
   product_context:  # Define which fields from the product information we should include
     - "product_title"  # Highest priority
     - "product_bullet_point" # Second highest priority
