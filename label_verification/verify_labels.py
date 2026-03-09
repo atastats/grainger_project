@@ -100,11 +100,12 @@ def verify_labels(
     pd.DataFrame
         A DataFrame containing the verification results for each row.
     """
-    log.info("Loading prompts...")
+    log.info("Loading prompt...")
     with open(config.prompt.label_verification_prompt_path, "r", encoding="utf-8") as f:
         label_verification_prompt = f.read()
 
     # Apply the verification function to each row in the DataFrame
+    log.info("Starting label verification...")
     results = df.apply(
         lambda row: verify_row(row, config, label_verification_prompt),
         axis=1,
