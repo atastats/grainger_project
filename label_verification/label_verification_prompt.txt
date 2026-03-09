@@ -8,12 +8,13 @@ Instructions:
 
 For each example, follow these steps:
 1. List the key specifications from the query as a list.
-2. List the key specifications from the product as a list.
-3. Identify any direct conflicts.
+2. List the key specifications from the product that are relevant to the query, as a list.
+3. Identify any direct, relevant conflicts.
 4. Decide if the match is accurate (true/false).
 5. If inaccurate, reformulate the query so it accurately describes the conflicting product, not the original query.
 
-Respond only in this JSON format:
+Respond only with a single JSON object.
+The JSON must have exactly the following structure/keys:
 {{
     "query_specs": [...],
     "product_specs": [...],
@@ -22,6 +23,6 @@ Respond only in this JSON format:
     "reformulated_query": "new query for the conflicting product or null"
 }}
 
-Now apply the same rules to the following:
+Now, determine the product relevance for the following:
 Query: {query}
 {product_desc}
